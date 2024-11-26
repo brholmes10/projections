@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>Synchronize Six Maps</title>
+    <meta name="viewport" content="initial-scale=1,maximum-scale=1,user-scalable=no">
+    <link href="https://api.mapbox.com/mapbox-gl-js/v2.13.0/mapbox-gl.css" rel="stylesheet">
+    <script src="https://api.mapbox.com/mapbox-gl-js/v2.13.0/mapbox-gl.js"></script>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            grid-template-rows: 1fr 1fr;
+            height: 100vh;
+        }
+        .map-container {
+            position: relative;
+        }
+        .map {
+            position: absolute;
+            top: 0;
+            bottom: 0;
+            left: 0;
+            right: 0;
+        }
+        .map-title {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    text-align: center;
+    background-color: rgba(255, 255, 255, 0.8);
+    padding: 5px;
+    font-size: 16px;
+    font-weight: bold;
+    z-index: 1; /* Ensures the title stays above the map */
+}
+
+    </style>
+</head>
+<body>
+    <body>
+        <div id="map1" class="map-container">
+            <div class="map-title">Globe</div>
+            <div class="map" id="map-1"></div>
+        </div>
+        <div id="map2" class="map-container">
+            <div class="map-title">Mercator</div>
+            <div class="map" id="map-2"></div>
+        </div>
+        <div id="map3" class="map-container">
+            <div class="map-title">Equirectangular</div>
+            <div class="map" id="map-3"></div>
+        </div>
+        <div id="map4" class="map-container">
+            <div class="map-title">Lambert Conformal Conic</div>
+            <div class="map" id="map-4"></div>
+        </div>
+        <div id="map5" class="map-container">
+            <div class="map-title">Albers</div>
+            <div class="map" id="map-5"></div>
+        </div>
+        <div id="map6" class="map-container">
+            <div class="map-title">Natural Earth</div>
+            <div class="map" id="map-6"></div>
+        </div>
+    </body>
+    
+
+    <script>
+        mapboxgl.accessToken = 'pk.eyJ1IjoiYnJob2xtZXMiLCJhIjoiY2xmMWMzeWltMDZ5dTN3bXgybXB6ejB0NiJ9.PgNy-r0Cr3JRsDO7Bygxaw';
+
+        // Create six maps with different styles and projections
+        const map1 = new mapboxgl.Map({
+            container: 'map-1',
+            style: 'mapbox://styles/mapbox/satellite-v9',
+            center: [-87.4603, 35.7245],
+            zoom: 1,
+            projection: 'globe'
+        });
+
+        const map2 = new mapboxgl.Map({
+            container: 'map-2',
+            style: 'mapbox://styles/mapbox/satellite-v9',
+            center: [-87.4603, 35.7245],
+            zoom: 1,
+            projection: 'mercator'
+        });
+
+        const map3 = new mapboxgl.Map({
+            container: 'map-3',
+            style: 'mapbox://styles/mapbox/satellite-v9',
+            center: [-87.4603, 35.7245],
+            zoom: 1,
+            projection: 'equirectangular'
+        });
+
+        const map4 = new mapboxgl.Map({
+            container: 'map-4',
+            style: 'mapbox://styles/mapbox/satellite-v9',
+            center: [-87.4603, 35.7245],
+            zoom: 1,
+            projection: 'lambertConformalConic'
+        });
+
+        const map5 = new mapboxgl.Map({
+            container: 'map-5',
+            style: 'mapbox://styles/mapbox/satellite-v9',
+            center: [-87.4603, 35.7245],
+            zoom: 1,
+            projection: 'albers'
+        });
+
+        const map6 = new mapboxgl.Map({
+            container: 'map-6',
+            style: 'mapbox://styles/mapbox/satellite-v9',
+            center: [-87.4603, 35.7245],
+            zoom: 1,
+            projection: 'naturalEarth'
+        });
+
+        const maps = [map1, map2, map3, map4, map5, map6];
+        let isSyncing = false;
+
+        // Synchronize all maps
+        function syncMaps(sourceMap) {
+            if (isSyncing) return;
+            isSyncing = true;
+
+            const center = sourceMap.getCenter();
+            const zoom = sourceMap.getZoom();
+            const pitch = sourceMap.getPitch();
+            const bearing = sourceMap.getBearing();
+
+            maps.forEach(map => {
+                if (map !== sourceMap) {
+                    map.setCenter(center);
+                    map.setZoom(zoom);
+                    map.setPitch(pitch);
+                    map.setBearing(bearing);
+                }
+            });
+
+            isSyncing = false;
+        }
+
+        // Add move event listeners to all maps
+        maps.forEach(map => {
+            map.on('move', () => syncMaps(map));
+        });
+    </script>
+</body>
+</html>
